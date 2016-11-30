@@ -1,0 +1,10 @@
+6 6
+c1 c1 c2 0 c3 c3
+c4 c4 c2 0 0 t1
+t2 g g 0 c5 t1
+t2 t3 t3 t3 c5 t1
+t2 c6 0 c7 c8 c8
+0 c6 0 c7 c9 c9
+
+
+
