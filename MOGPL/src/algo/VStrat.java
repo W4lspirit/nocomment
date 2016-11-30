@@ -24,11 +24,11 @@ public class VStrat implements IMovementStrat {
         clone = (Grid) grid.clone();
         // clean
         for (int k = front; k > nextfront; --k) {
-            clone.insert(k, p.col, "0");
+            clone.insertInGrid(k, p.col, "0");
         }
         // insert
         for (int k = nextfront; k >= nextEnd; --k) {
-            clone.insert(k, p.col, vehicule.getName());
+            clone.insertInGrid(k, p.col, vehicule.getName());
         }
         Vehicule v = clone.getVehicule(vehicule.getName());
         v.setPosition(new Position(nextEnd, p.col));
@@ -55,11 +55,11 @@ public class VStrat implements IMovementStrat {
         clone = (Grid) grid.clone();
         // clean
         for (int k = p.row; k < nextEnd; ++k) {
-            clone.insert(k, p.col, "0");
+            clone.insertInGrid(k, p.col, "0");
         }
         // insert
         for (int k = nextEnd; k <= nextfront; ++k) {
-            clone.insert(k, p.col, vehicule.getName());
+            clone.insertInGrid(k, p.col, vehicule.getName());
         }
         Vehicule v = clone.getVehicule(vehicule.getName());
         v.setPosition(new Position(nextEnd, p.col));

@@ -1,30 +1,21 @@
 package algo;
 
 public class VehiculeFactory {
-    /*******************************************************/
-    /*-------------------PARAMETERS------------------------*/
-    /*******************************************************/
-    /*******************************************************/
+
+	/*******************************************************/
 	/*-------------------PRINCIPAL METHODS-----------------*/
-    /*******************************************************/
-    /*******************************************************/
-	/*-------------------USEFUL METHODS--------------------*/
-    /*******************************************************/
-    /*******************************************************/
-	/*-------------------GETTER/SETTER---------------------*/
+	/*******************************************************/
+	public static Vehicule HVehicule(String s, int row, int col) {
+		Vehicule v = new Vehicule(s, row, col);
+		v.setStrat(new HStrat());
+		return v;
 
-    /*******************************************************/
-    public static Vehicule HVehicule() {
-        Vehicule v = new Vehicule();
-        v.setStrat(new HStrat());
-        return v;
+	}
 
+	public static Vehicule VVehicule(String s, int row, int col) {
+		Vehicule v = new Vehicule(s, row, col);
+		v.setStrat(new VStrat());
+		return v;
+	}
 
-    }
-
-    public static Vehicule VVehicule() {
-        Vehicule v = new Vehicule();
-        v.setStrat(new VStrat());
-        return v;
-    }
 }
