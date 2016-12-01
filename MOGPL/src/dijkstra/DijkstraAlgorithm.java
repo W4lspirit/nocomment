@@ -1,5 +1,8 @@
 package dijkstra;
 
+import model.TimeException;
+import model.Timer;
+
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -23,18 +26,27 @@ public class DijkstraAlgorithm {
     }
 
     public void execute(Grid source) {
+        Timer.start();
         distance.put(source, 0);
         unSettledNodes.add(source);
+
         while (unSettledNodes.size() > 0) {
             // first case first node
-            Grid node = getMinimum(unSettledNodes);
-            settledNodes.add(node);
-            unSettledNodes.remove(node);
-            findMinimalDistances(node);
+            // debug purpose System.out.println(unSettledNodes.size());
+            try {
+                Grid node = getMinimum(unSettledNodes);
+                settledNodes.add(node);
+                unSettledNodes.remove(node);
+                findMinimalDistances(node);
+            } catch (TimeException e) {
+                break;
+            }
+
         }
     }
 
-    private void findMinimalDistances(Grid node) {
+    private void findMinimalDistances(Grid node) throws TimeException {
+        Timer.check();
         List<Grid> adjacentNodes = getNeighbors(node);
         adjacentNodes.stream()
                 .filter(target -> getShortestDistance(target) > getShortestDistance(node) + getDistance(node, target))
@@ -53,13 +65,13 @@ public class DijkstraAlgorithm {
                 return edge.getWeight();
             }
         }
-        // TODO gen id check weight
+
         int weight = target.getWeight();
         if (isRHM) {
             weight = 1;
         }
-        edges.add(new Edge(Edge.getNextId(), node, target, weight));
-        edges.add(new Edge(Edge.getNextId(), target, node, weight));
+        edges.add(new Edge(node, target, weight));
+        edges.add(new Edge(target, node, weight));
         return weight;
     }
 
@@ -71,7 +83,7 @@ public class DijkstraAlgorithm {
         node.getNeighbors().forEach(g -> {
             int index = neighborsTemp.indexOf(g);
             if (index < 0) {
-                if (g.isSolution()) {
+                if (g.isSolution() && !finalDestinationGrid.contains(g)) {
                     finalDestinationGrid.add(g);
                 }
                 neighborsTemp.add(g);
@@ -83,7 +95,8 @@ public class DijkstraAlgorithm {
         return neighborsTemp;
     }
 
-    private Grid getMinimum(Set<Grid> grids) {
+    private Grid getMinimum(Set<Grid> grids) throws TimeException {
+        Timer.check();
         Grid minimum = null;
         for (Grid grid : grids) {
             if (minimum == null) {
@@ -110,14 +123,9 @@ public class DijkstraAlgorithm {
         }
     }
 
-    /*
-     * This method returns the path from the source to the selected target and
-     * NULL if no path exists
-     */
     public LinkedList<Grid> getPath(Grid target) {
         LinkedList<Grid> path = new LinkedList<>();
         Grid step = target;
-        // check if a path exists
         if (predecessors.get(step) == null) {
             return null;
         }
@@ -126,9 +134,51 @@ public class DijkstraAlgorithm {
             step = predecessors.get(step);
             path.add(step);
         }
-        // Put it into the correct order
         Collections.reverse(path);
         return path;
+    }
+
+    public LinkedList<Grid> getShortestPath() {
+        List<LinkedList<Grid>> linkedLists = new ArrayList<>();
+        finalDestinationGrid.forEach(g -> linkedLists.add(getPath(g)));
+        int minSize = Integer.MAX_VALUE;
+        LinkedList<Grid> list = null;
+        for (LinkedList<Grid> g : linkedLists) {
+            if (list == null) {
+                minSize = g.size();
+                list = g;
+            } else {
+                if (g.size() < minSize) {
+                    minSize = g.size();
+                    list = g;
+
+                }
+            }
+        }
+        return list;
+    }
+
+    public int getValue(LinkedList<Grid> path, boolean isRHM2) {
+        if (isRHM2) {
+            return path.size();
+        }
+        int max = 0;
+        for (int i = 0; i < path.size() - 1; ++i) {
+            Grid v, c;
+            v = path.get(i);
+            c = path.get(i + 1);
+            int index = edges.indexOf(new Edge(c, v, 0));
+            if (index > 0) {
+                max += edges.get(index).getWeight();
+            }
+
+        }
+
+        return max;
+    }
+
+    public int getNbSolutions() {
+        return finalDestinationGrid.size();
     }
 
 }

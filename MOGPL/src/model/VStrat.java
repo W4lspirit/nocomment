@@ -1,4 +1,4 @@
-package algo;
+package model;
 
 import dijkstra.Grid;
 import interfaces.IMovementStrat;
@@ -13,7 +13,7 @@ public class VStrat implements IMovementStrat {
         int end = p.row - 1;
         int nextEnd = p.row - quantity;
         int nextfront = front - quantity;
-        if (nextfront < 0) {
+        if (nextEnd < 0) {
             return null;
         }
         for (int k = end; k >= nextEnd; --k) {
@@ -21,7 +21,7 @@ public class VStrat implements IMovementStrat {
                 return null;
             }
         }
-        clone = (Grid) grid.clone();
+        clone = new Grid(grid);
         // clean
         for (int k = front; k > nextfront; --k) {
             clone.insertInGrid(k, p.col, "0");
@@ -32,6 +32,7 @@ public class VStrat implements IMovementStrat {
         }
         Vehicule v = clone.getVehicule(vehicule.getName());
         v.setPosition(new Position(nextEnd, p.col));
+        clone.setWeight(quantity);
         return clone;
     }
 
@@ -52,7 +53,7 @@ public class VStrat implements IMovementStrat {
                 return null;
             }
         }
-        clone = (Grid) grid.clone();
+        clone = new Grid(grid);
         // clean
         for (int k = p.row; k < nextEnd; ++k) {
             clone.insertInGrid(k, p.col, "0");
@@ -63,7 +64,7 @@ public class VStrat implements IMovementStrat {
         }
         Vehicule v = clone.getVehicule(vehicule.getName());
         v.setPosition(new Position(nextEnd, p.col));
-
+clone.setWeight(quantity);
         return clone;
     }
 }

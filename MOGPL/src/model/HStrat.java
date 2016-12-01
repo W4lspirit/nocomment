@@ -1,4 +1,4 @@
-package algo;
+package model;
 
 import dijkstra.Grid;
 import interfaces.IMovementStrat;
@@ -12,8 +12,8 @@ public class HStrat implements IMovementStrat {
         //end-1
         int end = p.col - 1;
         int nextEnd = p.col - quantity;
-        int nextfront = front - quantity;
-        if (nextfront < 0) {
+        int nextFront = front - quantity;
+        if (nextFront < 0||nextEnd<0) {
             return null;
         }
         for (int k = end; k >= nextEnd; --k) {
@@ -21,17 +21,18 @@ public class HStrat implements IMovementStrat {
                 return null;
             }
         }
-        clone = (Grid) grid.clone();
+        clone = new Grid(grid);
         // clean
-        for (int k = front; k > nextfront; --k) {
+        for (int k = front; k > nextFront; --k) {
             clone.insertInGrid(p.row, k, "0");
         }
         // insert
-        for (int k = nextfront; k >= nextEnd; --k) {
+        for (int k = nextFront; k >= nextEnd; --k) {
             clone.insertInGrid(p.row, k, vehicule.getName());
         }
         Vehicule v = clone.getVehicule(vehicule.getName());
         v.setPosition(new Position(p.row, nextEnd));
+        clone.setWeight(quantity);
         return clone;
     }
 
@@ -52,7 +53,7 @@ public class HStrat implements IMovementStrat {
                 return null;
             }
         }
-        clone = (Grid) grid.clone();
+        clone = new Grid(grid);
         // clean
         for (int k = p.col; k < nextEnd; ++k) {
             clone.insertInGrid(p.row, k, "0");
@@ -63,7 +64,7 @@ public class HStrat implements IMovementStrat {
         }
         Vehicule v = clone.getVehicule(vehicule.getName());
         v.setPosition(new Position(p.row, nextEnd));
-
+        clone.setWeight(quantity);
         return clone;
     }
 }

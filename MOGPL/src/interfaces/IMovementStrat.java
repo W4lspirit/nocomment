@@ -1,7 +1,7 @@
 package interfaces;
 
-import algo.Vehicule;
 import dijkstra.Grid;
+import model.Vehicule;
 
 
 public interface IMovementStrat {

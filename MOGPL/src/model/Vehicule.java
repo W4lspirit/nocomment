@@ -1,14 +1,13 @@
-package algo;
+package model;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import dijkstra.Grid;
 import interfaces.IMovementStrat;
 
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
 
-
-public class Vehicule implements Cloneable {
+public class Vehicule {
     private static final int _TRUCK_SIZE = 3;
     private static final int _CAR_SIZE = 2;
 
@@ -26,11 +25,16 @@ public class Vehicule implements Cloneable {
         size = getSize(name);
     }
 
-    public Vehicule() {
+
+    public Vehicule(Vehicule v) {
+        this.name = v.name;
+        this.size = v.size;
+        this.position = new Position(v.position);
+        this.strat = v.strat;
     }
 
     /*******************************************************/
-	/*-------------------PRINCIPAL METHODS-----------------*/
+    /*-------------------PRINCIPAL METHODS-----------------*/
 
     /*******************************************************/
     private Grid moveBackward(Grid grid, int quantity) {
@@ -42,38 +46,29 @@ public class Vehicule implements Cloneable {
     }
 
     // TODO change SET
-    public Collection<? extends Grid> getVehiculeDeplacements(Grid grid) {
-        Set<Grid> d = new HashSet<>();
+    public  List<Grid> getVehiculeDeplacements(Grid grid) {
+        List<Grid> deplacements = new ArrayList<>();
         int maxQuantity = grid.getNbRow() - size;
         for (int i = 1; i <= maxQuantity; ++i) {
             Grid forwardGrid = moveForward(grid, i);
             Grid backwardGrid = moveBackward(grid, i);
 
             if (forwardGrid != null)
-                d.add(forwardGrid);
+                deplacements.add(forwardGrid);
             if (backwardGrid != null)
-                d.add(backwardGrid);
+                deplacements.add(backwardGrid);
             if (forwardGrid == backwardGrid)
                 break;
         }
 
-        return d;
+        return deplacements;
     }
 
     /*******************************************************/
-	/*-------------------USEFUL METHODS--------------------*/
+    /*-------------------USEFUL METHODS--------------------*/
 
     /*******************************************************/
 
-    @Override
-    protected Object clone() throws CloneNotSupportedException {
-        Vehicule clone = new Vehicule();
-        clone.name = name;
-        clone.size = size;
-        clone.position = (Position) position.clone();
-        clone.strat = strat;
-        return clone;
-    }
 
     /*
      * (non-Javadoc)
