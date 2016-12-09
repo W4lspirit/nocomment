@@ -1,6 +1,7 @@
 package test.grid;
 
 import dijkstra.Grid;
+import main.html.HtmlWriter;
 import model.Vehicule;
 
 import org.junit.Test;
@@ -43,8 +44,9 @@ public class GridTest {
 
     @Test
     public void testGridVEqualsTrue() {
-        Grid g = new Grid("puzzles/dÃ©butant/jam1.txt");
+        Grid g = new Grid("puzzles/débutant/jam1.txt");
         System.out.println(g);
+        System.out.println(HtmlWriter.table(g));
         Grid f = new Grid(g);
         Vehicule kk = g.getVehicule("t4");
         assertTrue(kk.getSize() == 3);

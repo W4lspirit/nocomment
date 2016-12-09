@@ -4,6 +4,7 @@ import model.Position;
 import model.Vehicule;
 import model.VehiculeFactory;
 
+import java.awt.Graphics;
 import java.io.*;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -21,7 +22,6 @@ public class Grid implements Cloneable {
 	private List<List<String>> grid;
 
 	private Map<String, Vehicule> nameToVehicule;
-	
 
 	/*******************************************************/
 	/*-------------------CONSTRUCTORS----------------------*/
@@ -170,8 +170,7 @@ public class Grid implements Cloneable {
 		return true;
 	}
 
-	@Override
-	public String toString() {
+	public String toStringLight() {
 		StringBuilder stringBuilder = new StringBuilder();
 		grid.forEach(row -> {
 			row.forEach(c -> stringBuilder.append(String.format("%11s", c)));
@@ -181,9 +180,18 @@ public class Grid implements Cloneable {
 		return stringBuilder.toString();
 	}
 
-	// https://github.com/olbat/rushhour/blob/master/src/GUI/RushHourFrame.java
-	public void print() {
-		System.out.println(toString());
+	public String toString() {
+		StringBuilder stringBuilder = new StringBuilder();
+		grid.forEach(row -> {
+			row.forEach(c -> {
+				stringBuilder.append(c);
+				stringBuilder.append(" ");
+			});
+			stringBuilder.trimToSize();
+			stringBuilder.append("\n");
+		});
+
+		return stringBuilder.toString();
 	}
 
 	public void test() {
@@ -277,6 +285,11 @@ public class Grid implements Cloneable {
 	public boolean isSolution() {
 		Vehicule v = nameToVehicule.get(_G);
 		return v.getPosition().equals(finalPosition);
+
+	}
+
+	public List<List<String>> getGrid() {
+		return grid;
 
 	}
 

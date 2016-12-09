@@ -1,8 +1,5 @@
 package main;
 
-import dijkstra.DijkstraAlgorithm;
-import dijkstra.Grid;
-
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -15,90 +12,151 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Stream;
 
+import dijkstra.DijkstraAlgorithm;
+import dijkstra.Grid;
+import main.html.HtmlWriter;
+
 public class Main {
+	private static List<String> list = new ArrayList<>();
+	private static boolean debug = true;
 
-    public static void main(String[] args) {
-        if (args.length != 2) {
-            System.err.println("Invalid argument");
-            return;
-        }
-        // generer un nom id
-        launchDijkstra(args[0], Boolean.valueOf(args[1]));
+	public static void main(String[] args) {
+		if (args.length == 0) {
+			System.err.println("Invalid argument");
+			return;
+		}
 
-    }
+		if (args.length == 3) {
+			launchDijkstra(args[0], Boolean.valueOf(args[1]), Boolean.valueOf(args[2]));
+		}
+		if (args.length == 1) {
+			testAll();
+		}
 
-    public void m() {
-        try (Stream<Path> paths = Files.walk(Paths.get("puzzles"))) {
-            List<String> files = new ArrayList<>();
-            paths.forEach(filePath -> {
-                if (Files.isRegularFile(filePath)) {
-                    files.add(filePath.toString());
-                }
-            });
-            files.forEach(f -> {
-                launchDijkstra(f, true);
-                launchDijkstra(f, false);
-            });
-        } catch (IOException e) {
-            System.err.println("Error while retrieving all the file");
-        }
+	}
 
-    }
+	public static void testAll() {
+		try (Stream<Path> paths = Files.walk(Paths.get("puzzles"))) {
+			List<String> files = new ArrayList<>();
+			paths.forEach(filePath -> {
+				if (Files.isRegularFile(filePath)) {
+					files.add(filePath.toString());
+				}
+			});
+			files.forEach(f -> {
+				debug();
+				launchDijkstra(f, true, false);
+				launchDijkstra(f, false, false);
+			});
+			writeStat();
+		} catch (IOException e) {
+			System.err.println("Error while retrieving all the file");
+		}
 
-    private static void launchDijkstra(String f, boolean b) {
-        Grid grid = new Grid(f);
-        if (!grid.checkNonSense()) {
+	}
 
-            DijkstraAlgorithm algorithm = new DijkstraAlgorithm(b);
-            long start = System.currentTimeMillis();
-            algorithm.execute(grid);
-            long end = System.currentTimeMillis();
-            LinkedList<Grid> path = write(f, algorithm);
+	private static void debug() {
+		debug = false;
 
-            int nbSolutions = algorithm.getNbSolutions();
-            int value = algorithm.getValue(path, b);
-            long temps = end - start;
-            int nbConfR = 0;
-            System.out.println("fichier " + f + " nbSolutions " + nbSolutions + " RHC " + b + " Valeur "
-                    + value + " Temps " + temps + " nbConfR " + nbConfR);
-        } else {
-            System.err.println("Incorrect File");
-        }
-    }
+	}
 
-    private static LinkedList<Grid> printShortestPath(DijkstraAlgorithm algorithm) {
-        LinkedList<Grid> path = algorithm.getShortestPath();
-        path.forEach(System.out::println);
-        return path;
-    }
+	private static void launchDijkstra(String f, boolean rhm, boolean write) {
+		Grid grid = new Grid(f);
+		if (!grid.checkNonSense()) {
 
-    private static LinkedList<Grid> write(String path, DijkstraAlgorithm algorithm) {
-        LinkedList<Grid> paths = algorithm.getShortestPath();
-        try {
+			DijkstraAlgorithm algorithm = new DijkstraAlgorithm(rhm);
+			long start = System.currentTimeMillis();
+			algorithm.execute(grid);
+			long end = System.currentTimeMillis();
+			
 
-            File file = new File(path + "_sol");
+			int nbSolutions = algorithm.getNbSolutions();
+			int value = algorithm.getValue(path, rhm);
+			long temps = end - start;
+			LinkedList<Grid> path = writeShortestPath(f, algorithm, write);
+			append("fichier " + f + " nbSolutions " + nbSolutions + " RHM " + rhm + " Valeur " + value + " Temps "
+					+ temps + "\n");
+		} else {
+			System.err.println("Incorrect File");
+		}
+	}
 
-            if (!file.exists()) {
-                file.createNewFile();
-            }
+	private static void append(String e) {
+		list.add(e);
+	}
 
-            FileWriter fw = new FileWriter(file.getAbsoluteFile());
-            BufferedWriter bw = new BufferedWriter(fw);
+	private static void writeStat() {
+		try {
 
-            paths.forEach(p -> {
-                try {
-                    bw.write(p.toString());
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            });
-            bw.close();
+			String fResName = "puzzles/sol";
+			File file = new File(fResName);
 
-            System.out.println("Done");
+			if (!file.exists()) {
+				file.createNewFile();
+			}
 
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return paths;
-    }
+			FileWriter fw = new FileWriter(file.getAbsoluteFile());
+			BufferedWriter bw = new BufferedWriter(fw);
+
+			list.forEach(p -> {
+				try {
+					bw.write(p);
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			});
+			bw.close();
+
+			System.out.println("Done");
+
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+	private static LinkedList<Grid> writeShortestPath(String path, DijkstraAlgorithm algorithm, boolean write, boolean rhm, String f, String nbSolutions, String value, String temps) {
+		LinkedList<Grid> paths = algorithm.getShortestPath();
+		if (write) {
+			try {
+
+				File file = new File(path + "_sol.html");
+
+				if (!file.exists()) {
+					file.createNewFile();
+				}
+
+				FileWriter fw = new FileWriter(file.getAbsoluteFile());
+				BufferedWriter bw = new BufferedWriter(fw);
+				bw.write(HtmlWriter.start());
+				bw.write("<h2>");
+				bw.write("fichier " + f + " nbSolutions " + nbSolutions + " RHM " + rhm + " Valeur " + value + " Temps "
+						+ temps + "\n");
+				bw.write("</h2>");
+				paths.forEach(p -> {
+
+					try {
+						bw.write(HtmlWriter.newTable());
+						bw.write(HtmlWriter.table(p));
+						bw.write(HtmlWriter.endTable());
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+				});
+
+			
+				bw.write(HtmlWriter.stop());
+				bw.close();
+
+				System.out.println("Done");
+
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		} else {
+			if (debug) {
+				paths.forEach(System.out::println);
+			}
+		}
+		return paths;
+	}
 }
